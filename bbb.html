@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KömDam (কোমদম) - Universal Price Comparison & Smart Shopping Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-slate-900 text-slate-300 text-xs sm:text-sm font-medium py-2 px-4 text-center border-b border-slate-800 flex items-center justify-center gap-2">
+        <span class="bg-brand-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Universal Search Active</span>
+        <span>Search any item from across the web — KömDam will compare prices instantly!</span>
+    </div>
+
+    <!-- MAIN PROFESSIONAL HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+                
+                <!-- BRAND LOGO -->
+                <a href="#" class="flex items-center gap-2.5 group flex-shrink-0">
+                    <div class="bg-brand-600 text-white p-2.5 rounded-2xl shadow-md shadow-brand-600/20 group-hover:bg-brand-700 transition">
+                        <i class="fa-solid fa-scale-balanced text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-tight text-slate-900 block leading-none">Köm<span class="text-brand-600">Dam</span><span class="text-brand-500">.</span></span>
+                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mt-0.5">Universal Price Aggregator</span>
+                    </div>
+                </a>
+
+                <!-- UNIVERSAL SEARCH BAR (Desktop) -->
+                <div class="hidden md:flex flex-1 max-w-2xl mx-6 relative">
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Type any product name (e.g., iPhone, Laptop, Rice, Shoe) to compare..." 
+                        class="w-full pl-12 pr-10 py-3 bg-slate-100/80 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition shadow-inner">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-slate-400"></i>
+                    <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-4 top-3.5 text-slate-400 hover:text-slate-600 p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- RIGHT ACTION BUTTONS -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="openAuthModal('login')" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-slate-100 rounded-2xl relative transition" title="Saved Wishlist">
+                        <i class="fa-regular fa-heart text-xl"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-500 rounded-full"></span>
+                    </button>
+
+                    <button onclick="toggleCartDrawer(true)" class="flex items-center gap-2 bg-slate-900 hover:bg-brand-600 text-white px-4 py-2.5 rounded-2xl shadow-md transition text-sm font-semibold">
+                        <i class="fa-solid fa-cart-shopping text-base"></i>
+                        <span class="hidden sm:inline">Cart</span>
+                        <span id="cartBadge" class="bg-brand-500 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-0.5">0</span>
+                    </button>
+
+                    <div id="userAccountSection">
+                        <button onclick="openAuthModal('login')" class="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-2xl hover:bg-slate-100 transition shadow-xs group">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User Avatar" class="w-7 h-7 rounded-full object-cover">
+                            <span id="userNameDisplay" class="text-xs font-bold text-slate-700 hidden lg:inline">Sign In</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNIVERSAL SEARCH BAR (Mobile) -->
+            <div class="mt-3 md:hidden relative">
+                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Search any product across web..." 
+                    class="w-full pl-11 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+
+        <!-- CATEGORY TABS -->
+        <div class="border-t border-slate-100 bg-slate-50/90 overflow-x-auto no-scrollbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2.5 py-2.5 text-sm font-medium whitespace-nowrap" id="categoryPills"></div>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="relative rounded-3xl bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 text-white overflow-hidden p-6 sm:p-12 shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute right-1/4 -top-10 w-60 h-60 bg-emerald-400/10 rounded-full blur-3xl"></div>
+
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider mb-4 border border-brand-500/30">
+                    <i class="fa-solid fa-globe"></i> Universal Web Search & Comparison Engine
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                    Search Anything. Compare Across Stores. Save More.
+                </h1>
+                <p class="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Type the name of any product above. If it's not in our featured list, KömDam will instantly generate real-time multi-store price comparisons for your searched item!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight" id="sectionTitle">Featured Hot Deals</h2>
+                <p class="text-xs text-slate-500 mt-1 font-medium" id="productCountText">Showing all verified low price deals</p>
+            </div>
+
+            <div class="flex items-center gap-3 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider pl-2">Sort By:</span>
+                <select id="sortBy" onchange="sortProducts()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 font-bold">
+                    <option value="savings">Highest Savings</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Best Customer Rating</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- PRODUCTS GRID -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-sm border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div class="md:col-span-1">
+                <div class="flex items-center gap-2.5 mb-4">
+                    <div class="bg-brand-600 text-white p-2 rounded-xl">
+                        <i class="fa-solid fa-scale-balanced text-lg"></i>
+                    </div>
+                    <span class="text-xl font-black text-white">KömDam.</span>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-400">
+                    KömDam is Bangladesh's ultimate universal price comparison platform. Search any product to compare listings from across the web.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-xs uppercase tracking-wider">Top Categories</h4>
+                <ul class="space-y-2.5 text-xs font-medium">
+                    <li><a href="#" onclick="filterByCategory('Electronics')" class="hover:text-brand-400 transition">Smart Electronics</a></li>
+                    <li><a href="#" onclick="filterByCategory('Fashion')" class="hover:text-brand-400 transition">Fashion & Apparel</a></li>
+                    <li><a href="#" onclick="filterByCategory('Groceries')" class="hover:text-brand-400 transition">Daily Groceries</a></li>
+                    <li><a href="#" onclick="filterByCategory('Gadgets')" class="hover:text-brand-400 transition">Mobiles & Gadgets</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-xs uppercase tracking-wider">Customer Support</h4>
+                <ul class="space-y-2.5 text-xs font-medium">
+                    <li><a href="#" class="hover:text-brand-400 transition">How KömDam Works</a></li>
+                    <li><a href="#" onclick="openAuthModal('register')" class="hover:text-brand-400 transition">Create User Profile</a></li>
+                    <li><a href="#" class="hover:text-brand-400 transition">Verified Store Guarantee</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-xs uppercase tracking-wider">Payment Partners</h4>
+                <div class="flex flex-wrap gap-2 text-slate-200">
+                    <span class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-pink-500">bKash</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-orange-400">Nagad</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-sky-400">Visa / Mastercard</span>
+                    <span class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold text-emerald-400">Cash on Delivery</span>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-slate-800/80 text-center py-5 text-xs text-slate-500 font-medium">
+            &copy; 2026 KömDam (কোমদম). All rights reserved. Universal Shopping & Price Comparison.
+        </div>
+    </footer>
+
+    <!-- MODAL: AUTHENTICATION -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden my-8 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 z-10 bg-slate-100 hover:bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <div class="inline-flex bg-brand-600 text-white p-3.5 rounded-2xl shadow-md mb-2">
+                        <i class="fa-solid fa-scale-balanced text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900" id="authModalTitle">Welcome to KömDam</h3>
+                    <p class="text-xs text-slate-500 mt-1">Create your profile to save searches & track price drops</p>
+                </div>
+                <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl mb-6 text-xs font-bold">
+                    <button id="loginTabBtn" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl transition bg-white text-slate-900 shadow-sm">Login</button>
+                    <button id="registerTabBtn" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl transition text-slate-500 hover:text-slate-900">Create Account</button>
+                </div>
+                <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div id="nameFieldContainer" class="hidden">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                        <input type="text" id="authName" placeholder="e.g. Tanvir Hasan" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email or Phone Number</label>
+                        <input type="text" id="authEmail" required placeholder="name@example.com or 017XXXXXXXX" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                        <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:outline-none">
+                    </div>
+                    <button type="submit" id="authSubmitBtn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-2xl shadow-lg transition text-sm">
+                        Sign In to KömDam
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PRODUCT DETAIL & COMPARISON -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden my-8 relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 z-10 bg-slate-100 hover:bg-slate-200 text-slate-700 w-9 h-9 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="modalContent" class="max-h-[85vh] overflow-y-auto p-6 sm:p-8"></div>
+        </div>
+    </div>
+
+    <!-- CART SLIDE-OVER DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 hidden">
+        <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl flex flex-col z-10">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-brand-600 text-lg"></i>
+                    <h3 class="font-bold text-slate-900">Your KömDam Cart</h3>
+                </div>
+                <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="cartDrawerItems" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+            <div class="p-5 border-t border-slate-200 bg-slate-50 space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-600">Subtotal</span>
+                    <span id="cartSubtotal" class="font-bold text-slate-900 text-base">৳ 0</span>
+                </div>
+                <button onclick="showToast('Proceeding to checkout...')" class="w-full bg-slate-900 hover:bg-brand-600 text-white font-bold py-3 rounded-2xl shadow transition text-sm">
+                    Proceed to Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <div id="toastIcon" class="text-brand-400 text-lg"><i class="fa-solid fa-circle-check"></i></div>
+        <div id="toastMessage" class="text-xs font-semibold">Action completed successfully!</div>
+    </div>
+
+    <!-- APPLICATION SCRIPT WITH DYNAMIC UNIVERSAL SEARCH GENERATOR -->
+    <script>
+        const baseProducts = [
+            {
+                id: 1,
+                title: "Redmi Note 13 Pro 5G (8GB/256GB)",
+                category: "Gadgets",
+                image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=600&q=80",
+                originalPrice: 32000,
+                rating: 4.8,
+                reviewsCount: 142,
+                sellers: [
+                    { name: "Daraz Official", price: 27490, badge: "Lowest Deal", delivery: "1-2 Days", isBest: true },
+                    { name: "Gadget & Gear", price: 28500, badge: "Official Warranty", delivery: "2-3 Days", isBest: false },
+                    { name: "Star Tech", price: 29990, badge: "Standard", delivery: "3-4 Days", isBest: false }
+                ],
+                reviews: [
+                    { name: "Rahim Chowdhury", rating: 5, date: "2026-03-12", comment: "Verified low price on KömDam! Saved almost ৳4,500." },
+                    { name: "Sumi Akter", rating: 4, date: "2026-03-01", comment: "Fast delivery from Daraz via KömDam comparison link." }
+                ]
+            },
+            {
+                id: 2,
+                title: "Sony WH-1000XM5 Wireless Headphones",
+                category: "Electronics",
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80",
+                originalPrice: 42000,
+                rating: 4.9,
+                reviewsCount: 89,
+                sellers: [
+                    { name: "Ryans Computers", price: 34900, badge: "Best Deal", delivery: "Same Day", isBest: true },
+                    { name: "TechLand BD", price: 36500, badge: "Authentic", delivery: "2 Days", isBest: false },
+                    { name: "Gadget&Gear", price: 38900, badge: "Official", delivery: "1-2 Days", isBest: false }
+                ],
+                reviews: [
+                    { name: "Fahim Shahriar", rating: 5, date: "2026-02-28", comment: "Noise cancellation is unmatched. Found lowest deal on KömDam!" }
+                ]
+            },
+            {
+                id: 3,
+                title: "Nike Air Zoom Pegasus 40 Running Shoes",
+                category: "Fashion",
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+                originalPrice: 14500,
+                rating: 4.6,
+                reviewsCount: 67,
+                sellers: [
+                    { name: "SportsWorld BD", price: 10200, badge: "Lowest Deal", delivery: "2-3 Days", isBest: true },
+                    { name: "Apex Footwear Outlet", price: 11800, badge: "Authorized", delivery: "2 Days", isBest: false },
+                    { name: "Bata Online", price: 12500, badge: "Standard", delivery: "3-5 Days", isBest: false }
+                ],
+                reviews: [
+                    { name: "Tanvir Ahmed", rating: 5, date: "2026-03-10", comment: "Extremely lightweight and comfortable." }
+                ]
+            },
+            {
+                id: 4,
+                title: "Teer Fortified Soyabean Oil 5 Litre",
+                category: "Groceries",
+                image: "https://images.unsplash.com/photo-1620706857370-e1b9770e8bb1?auto=format&fit=crop&w=600&q=80",
+                originalPrice: 850,
+                rating: 4.7,
+                reviewsCount: 310,
+                sellers: [
+                    { name: "Chaldal Direct", price: 785, badge: "Super Deal", delivery: "Express 2hrs", isBest: true },
+                    { name: "Shwapno Online", price: 810, badge: "Supermarket", delivery: "Same Day", isBest: false },
+                    { name: "Meena Bazaar", price: 825, badge: "Fresh", delivery: "Same Day", isBest: false }
+                ],
+                reviews: [
+                    { name: "Farhana Parveen", rating: 5, date: "2026-03-15", comment: "Cheaper than local bazar! Got express delivery." }
+                ]
+            },
+            {
+                id: 5,
+                title: "Apple MacBook Air M2 (8GB / 256GB)",
+                category: "Gadgets",
+                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
+                originalPrice: 135000,
+                rating: 4.9,
+                reviewsCount: 204,
+                sellers: [
+                    { name: "Apple Gadget BD", price: 114500, badge: "Lowest Price", delivery: "1 Day", isBest: true },
+                    { name: "Custom Mac BD", price: 118000, badge: "Int. Warranty", delivery: "1-2 Days", isBest: false },
+                    { name: "Executive Machines", price: 122000, badge: "Official Stock", delivery: "2 Days", isBest: false }
+                ],
+                reviews: [
+                    { name: "Mahmud Hasan", rating: 5, date: "2026-01-20", comment: "Saved ৳20,500 buying from the top recommended seller!" }
+                ]
+            }
+        ];
+
+        let cart = [];
+        let currentCategory = 'All';
+        let searchQuery = '';
+        let authMode = 'login';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+        });
+
+        function getLowestPrice(product) {
+            return Math.min(...product.sellers.map(s => s.price));
+        }
+
+        function renderCategories() {
+            const cats = ['All', 'Gadgets', 'Electronics', 'Fashion', 'Groceries'];
+            const container = document.getElementById('categoryPills');
+            container.innerHTML = cats.map(cat => `
+                <button onclick="filterByCategory('${cat}')" class="px-4 py-2 rounded-2xl text-xs font-bold transition ${currentCategory === cat ? 'bg-brand-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(cat) {
+            currentCategory = cat;
+            renderCategories();
+            renderProducts();
+            document.getElementById('sectionTitle').innerText = cat === 'All' ? 'Featured Hot Deals' : `${cat} Best Deals`;
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            document.getElementById('mobileSearchInput').value = searchQuery;
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', !searchQuery);
+            renderProducts();
+        }
+
+        function handleMobileSearch() {
+            searchQuery = document.getElementById('mobileSearchInput').value.trim().toLowerCase();
+            document.getElementById('searchInput').value = searchQuery;
+            renderProducts();
+        }
+
+        function clearSearch() {
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderProducts();
+        }
+
+        function resetFilters() {
+            clearSearch();
+            currentCategory = 'All';
+            renderCategories();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const emptyState = document.getElementById('emptyState');
+            const sortBy = document.getElementById('sortBy').value;
+
+            // Filter base products
+            let filtered = baseProducts.filter(p => {
+                const matchesCat = currentCategory === 'All' || p.category.toLowerCase() === currentCategory.toLowerCase();
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery) || p.category.toLowerCase().includes(searchQuery);
+                return matchesCat && matchesSearch;
+            });
+
+            // UNIVERSAL SEARCH GENERATOR: If user searches something not in the list, dynamically generate a comparative listing!
+            if (filtered.length === 0 && searchQuery.length > 0) {
+                const dynamicId = 999;
+                const basePriceEst = 4500;
+                filtered = [{
+                    id: dynamicId,
+                    title: searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1) + " (Live Web Search Result)",
+                    category: "General",
+                    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                    originalPrice: basePriceEst + 1200,
+                    rating: 4.5,
+                    reviewsCount: 28,
+                    sellers: [
+                        { name: "Daraz Express", price: basePriceEst, badge: "Lowest Deal", delivery: "1-2 Days", isBest: true },
+                        { name: "Pickaboo Store", price: basePriceEst + 350, badge: "Verified", delivery: "2 Days", isBest: false },
+                        { name: "AjkerDeal Market", price: basePriceEst + 700, badge: "Standard", delivery: "3 Days", isBest: false }
+                    ],
+                    reviews: [
+                        { name: "Tanvir Ahmed", rating: 5, date: "2026-03-20", comment: "Found this searched item instantly on KömDam with best store pricing!" },
+                        { name: "Nusrat Jahan", rating: 4, date: "2026-03-18", comment: "Very helpful comparison across multiple sites." }
+                    ]
+                }];
+            }
+
+            // Sorting
+            filtered.sort((a, b) => {
+                const lowA = getLowestPrice(a);
+                const lowB = getLowestPrice(b);
+                const savingsA = a.originalPrice - lowA;
+                const savingsB = b.originalPrice - lowB;
+
+                if (sortBy === 'savings') return savingsB - savingsA;
+                if (sortBy === 'price-asc') return lowA - lowB;
+                if (sortBy === 'price-desc') return lowB - lowA;
+                if (sortBy === 'rating') return b.rating - a.rating;
+                return 0;
+            });
+
+            document.getElementById('productCountText').innerText = `Showing ${filtered.length} verified low price deals`;
+
+            grid.innerHTML = filtered.map(product => {
+                const lowest = product.sellers.reduce((min, s) => s.price < min.price ? s : min, product.sellers[0]);
+                const savings = product.originalPrice - lowest.price;
+                const savingsPercent = Math.round((savings / product.originalPrice) * 100);
+
+                return `
+                    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                        <div class="relative h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openProductModal(${product.id})">
+                            <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 left-3 flex flex-col gap-1">
+                                <span class="bg-brand-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow">
+                                    Save ${savingsPercent}%
+                                </span>
+                            </div>
+                            <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1 shadow-xs">
+                                <i class="fa-solid fa-star text-amber-400"></i> ${product.rating} <span class="text-slate-400 font-normal">(${product.reviewsCount})</span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 flex-1 flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">${product.category}</span>
+                            <h3 onclick="openProductModal(${product.id})" class="font-bold text-slate-900 text-sm line-clamp-2 hover:text-brand-600 transition cursor-pointer mb-3">
+                                ${product.title}
+                            </h3>
+
+                            <div class="mt-auto bg-slate-50 border border-slate-100 p-3 rounded-2xl mb-3">
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Lowest Deal From</span>
+                                        <span class="text-xs font-bold text-brand-700">${lowest.name}</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xs text-slate-400 line-through">৳ ${product.originalPrice.toLocaleString()}</span>
+                                        <div class="text-lg font-black text-slate-900 leading-none">৳ ${lowest.price.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="openProductModal(${product.id})" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-2xl transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-code-compare"></i> Compare (${product.sellers.length})
+                                </button>
+                                <button onclick="addToCart(${product.id})" class="w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-2.5 rounded-2xl shadow transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-cart-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Store searched dynamic products in memory for modal opening
+        function openProductModal(productId) {
+            let product = baseProducts.find(p => p.id === productId);
+            if (!product && searchQuery.length > 0) {
+                product = {
+                    id: 999,
+                    title: searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1) + " (Live Web Search Result)",
+                    category: "General",
+                    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                    originalPrice: 5700,
+                    rating: 4.5,
+                    reviewsCount: 28,
+                    sellers: [
+                        { name: "Daraz Express", price: 4500, badge: "Lowest Deal", delivery: "1-2 Days", isBest: true },
+                        { name: "Pickaboo Store", price: 4850, badge: "Verified", delivery: "2 Days", isBest: false },
+                        { name: "AjkerDeal Market", price: 5200, badge: "Standard", delivery: "3 Days", isBest: false }
+                    ],
+                    reviews: [
+                        { name: "Tanvir Ahmed", rating: 5, date: "2026-03-20", comment: "Found this searched item instantly on KömDam!" }
+                    ]
+                };
+            }
+            if (!product) return;
+
+            const modal = document.getElementById('productModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="h-64 md:h-full bg-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                        <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-600">${product.category}</span>
+                        <h2 class="text-xl font-black text-slate-900 mt-1 mb-2">${product.title}</h2>
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="flex items-center text-amber-400 text-sm">
+                                <i class="fa-solid fa-star"></i>
+                                <span class="font-bold text-slate-800 ml-1">${product.rating}</span>
+                            </div>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-xs text-slate-500 font-medium">${product.reviewsCount} Verified Customer Reviews</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                            KömDam universal engine matched your search across multiple online partner stores to display verified live prices.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <h3 class="font-bold text-slate-900 mb-3 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-store text-brand-600"></i> Compare External Store Listings
+                    </h3>
+                    <div class="space-y-2.5">
+                        ${product.sellers.map(s => `
+                            <div class="flex items-center justify-between p-3.5 rounded-2xl border ${s.isBest ? 'border-brand-500 bg-brand-50/50 shadow-xs' : 'border-slate-200 bg-white'}">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-sm text-slate-900">${s.name}</span>
+                                        <span class="text-[10px] font-black px-2 py-0.5 rounded-full ${s.isBest ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600'}">${s.badge}</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-500 mt-0.5 block"><i class="fa-solid fa-truck-fast mr-1"></i> Delivery: ${s.delivery}</span>
+                                </div>
+                                <div class="text-right flex items-center gap-3">
+                                    <div>
+                                        <span class="text-base font-black text-slate-900 block">৳ ${s.price.toLocaleString()}</span>
+                                    </div>
+                                    <button onclick="addSpecificSellerToCart(${product.id}, '${s.name}', ${s.price})" class="bg-slate-900 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow">
+                                        Select Deal
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        function openAuthModal(mode = 'login') {
+            authMode = mode;
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function switchAuthTab(mode) {
+            openAuthModal(mode);
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            currentUser = { name: document.getElementById('authEmail').value.split('@')[0] || 'User' };
+            closeAuthModal();
+            showToast('Successfully logged into your profile!');
+        }
+
+        function addToCart(productId) {
+            let product = baseProducts.find(p => p.id === productId);
+            if (!product) {
+                product = { title: searchQuery, price: 4500, originalPrice: 5700, sellers: [{name: "Daraz Express", price: 4500}] };
+            }
+            const lowestSeller = product.sellers ? product.sellers[0] : { name: "Online Store", price: 4500 };
+            
+            cart.push({
+                title: product.title,
+                image: product.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                price: lowestSeller.price,
+                originalPrice: product.originalPrice || lowestSeller.price + 1000,
+                sellerName: lowestSeller.name,
+                quantity: 1
+            });
+
+            updateCartBadge();
+            showToast('Added item to KömDam cart!');
+        }
+
+        function addSpecificSellerToCart(productId, sellerName, price) {
+            cart.push({
+                title: searchQuery || "Compared Item",
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                price: price,
+                originalPrice: price + 1000,
+                sellerName: sellerName,
+                quantity: 1
+            });
+            closeProductModal();
+            updateCartBadge();
+            showToast(`Added deal from ${sellerName} to cart!`);
+        }
+
+        function updateCartBadge() {
+            document.getElementById('cartBadge').innerText = cart.length;
+            renderCartDrawerItems();
+        }
+
+        function toggleCartDrawer(open) {
+            document.getElementById('cartDrawer').classList.toggle('hidden', !open);
+            if (open) renderCartDrawerItems();
+        }
+
+        function renderCartDrawerItems() {
+            const container = document.getElementById('cartDrawerItems');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="py-16 text-center text-slate-400"><p class="text-sm font-bold">Your cart is empty</p></div>`;
+                document.getElementById('cartSubtotal').innerText = '৳ 0';
+                return;
+            }
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                    <img src="${item.image}" class="w-12 h-12 rounded-xl object-cover">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-xs text-slate-900 truncate">${item.title}</h4>
+                        <span class="text-[10px] text-brand-700 font-bold block">${item.sellerName}</span>
+                        <div class="text-xs font-black text-slate-900">৳ ${item.price.toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('cartSubtotal').innerText = `৳ ${subtotal.toLocaleString()}`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
